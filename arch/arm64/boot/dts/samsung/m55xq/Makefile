@@ -12,6 +12,9 @@ define sec_dtbo_build
 $(foreach dtbo, $(1), $(eval $(call __sec_dtbo_build,$(dtbo),$(2),$(3))))
 endef
 
+# DIWALI BASE DTB
+QCOM_DTB := ../../vendor/samsung
+
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 SEC_M55XQ_BOARDS        := \
         diwali-sec.m55xq.overlay.00.dtbo \
@@ -23,8 +26,6 @@ SEC_M55XQ_BOARDS        := \
         diwali-sec.m55xq.overlay.06.dtbo \
         diwali-sec.m55xq.overlay.07.dtbo
 
-# DIWALI BASE DTB
-QCOM_DTB := ../../vendor/samsung
 SEC_DIWALI_BASE_DTB := $(QCOM_DTB)/diwali.dtb $(QCOM_DTB)/diwalip.dtb $(QCOM_DTB)/diwali-lte.dtb
 
 $(eval $(call sec_dtbo_build, \
