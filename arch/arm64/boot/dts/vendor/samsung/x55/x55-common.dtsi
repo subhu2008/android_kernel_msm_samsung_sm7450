@@ -1,0 +1,21 @@
+/* M55 code for SR-QN6887A-01-321 by gaochao at 20230814 start */
+#include "x55_SecurityIC.dtsi"
+/* M55 code for SR-QN6887A-01-321 by gaochao at 20230814 end */
+/* M55 code for SR-QN6887A-01-318 by gaochao at 20230908 start */
+#include "x55_KnoxVault2.dtsi"
+/* M55 code for SR-QN6887A-01-318 by gaochao at 20230908 end */
+/*M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 start*/
+#include "x55-touchscreen.dtsi"
+/*M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 end*/
+/*M55 code for SR-QN6887A-01-548 by xiongxiaoliang at 20230814 start*/
+#include "x55-charger.dtsi"
+/*M55 code for SR-QN6887A-01-548 by xiongxiaoliang at 20230814 end*/
+/*M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 start*/
+#include "sdcard-common.dtsi"
+/*M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 end*/
+/*M55 code for SR-QN6887A-01-457 by lichang at 20230907 start*/
+#include "x55_sar.dtsi"
+/*M55 code for SR-QN6887A-01-457 by lichang at 20230907 end*/
+/*M55 code for SR-QN6887A-01-202 by lijun at 20230816 start*/
+#include "x55-nfc.dtsi"
+/*M55 code for SR-QN6887A-01-202 by lijun at 20230816 end*/

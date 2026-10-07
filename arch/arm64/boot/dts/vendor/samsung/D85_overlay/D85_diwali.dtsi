@@ -1,0 +1,6 @@
+/* Add only for D85 build, it is empty in normal build */
+/*M55 code for QN6887A-581 by shixuanxuan at 20231207 start*/
+&chosen{
+    bootargs = "boot_cpus=0,1,console=ttyMSM0,115200n8 loglevel=6 log_buf_len=256K kernel.panic_on_rcu_stall=1 loop.max_part=7 pcie_ports=compat msm_rtb.filter=0x237 allow_mismatched_32bit_el0 kasan=off rcupdate.rcu_expedited=1 rcu_nocbs=0-7 ftrace_dump_on_oops pstore.compress=none kpti=0 swiotlb=noforce cgroup.memory=nokmem,nosocket cpufreq.default_governor=walt page_poison=on kswapd_per_node=2 fsa4480_i2c.async_probe=1 can.stats_timer=0 allow_file_spec_access disable_dma32=on maxcpus=6";
+};
+/*M55 code for QN6887A-581 by shixuanxuan at 20231207 end*/

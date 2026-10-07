@@ -1,0 +1,30 @@
+&soc {
+};
+/*M55 code for SR-QN6887A-01-391 by hehaoran at 20231008 start*/
+&qupv3_se0_i2c {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    status = "ok";
+
+    qcom,i2c-touch-active = "focaltech,fts_ts";
+    // qcom,le-vm;
+    focaltech_ts@38{
+            compatible = "focaltech,fts_ts";
+            reg = <0x38>;
+            status = "ok";
+            focaltech,max-touch-number = <10>;
+            focaltech,display-coords =  <0 0 1079 2399>;
+            focaltech,ic-type = <0x56720090>;
+            focaltech,touch-type = "primary";
+            focaltech,trusted-touch-mode = "vm_mode";
+            focaltech,touch-environment = "tvm";
+            focaltech,trusted-touch-type = "primary";
+            focaltech,reset-gpio-base = <0xF10E000>;
+            focaltech,intr-gpio-base = <0xF133000>;
+            focaltech,trusted-touch-spi-irq = <566>;//601 754
+            focaltech,trusted-touch-io-bases = <0x980000 0x910000>;//990000
+            focaltech,trusted-touch-io-sizes = <0x1000 0x4000>;
+            focaltech,trusted-touch-vm-gpio-list = <&tlmm 0 0 &tlmm 1 0 &tlmm 14 0 &tlmm 51 0x2008>;
+        };
+};
+/*M55 code for SR-QN6887A-01-391 by hehaoran at 20231008 end*/

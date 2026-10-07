@@ -1,0 +1,37 @@
+#include "diwali-pm7250b.dtsi"
+/*M55 code for QN6887A-107/QN6887A-400/QN6887A-1860 by shanxinkai at 20231126 start*/
+&battery_charger {
+	qcom,thermal-mitigation = <8500000 8000000 6000000 5500000 5000000 4000000 3500000 3000000 2000000 1000000>;
+};
+/*M55 code for QN6887A-107/QN6887A-400/QN6887A-1860 by shanxinkai at 20231126 end*/
+
+&usb0 {
+	usb-role-switch;
+	extcon = <&eud>;
+
+	dwc3@a600000 {
+		usb-role-switch;
+		dr_mode = "otg";
+	};
+
+	port {
+		usb_port0: endpoint {
+			remote-endpoint = <&usb_port0_connector>;
+		};
+	};
+};
+
+&ucsi {
+	connector {
+		port {
+			usb_port0_connector: endpoint {
+				remote-endpoint = <&usb_port0>;
+			};
+		};
+	};
+};
+
+&usb_qmp_dp_phy {
+	pinctrl-names = "unused";
+};
+
