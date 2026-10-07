@@ -1,0 +1,91 @@
+/*
+&soc {
+	qupv3_1_se3_spi: spi@a8c000 {
+		compatible = "qcom,spi-geni";
+		reg = <0xa8c000 0x4000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg-names = "se_phys";
+		interrupts = <GIC_SPI 356 IRQ_TYPE_LEVEL_HIGH>;
+		clock-names = "se-clk", "m-ahb", "s-ahb";
+		clocks = <&gcc GCC_QUPV3_WRAP1_S3_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_1_se3_spi_active>;
+		pinctrl-1 = <&qupv3_1_se3_spi_sleep>;
+		dmas = <&gpi_dma1 0 3 1 64 0>,
+			<&gpi_dma1 1 3 1 64 0>;
+		dma-names = "tx", "rx";
+		spi-max-frequency = <10000000>;
+		qcom,wrapper-core = <&qupv3_1>;
+		status = "disabled";
+	};
+};
+*/
+
+/*
+&tlmm {
+	qupv3_1_se3_spi_pins: qupv3_1_se3_spi_pins {
+		qupv3_1_se3_spi_active: qupv3_1_se3_spi_active {
+			mux {
+				pins = "gpio44", "gpio45",
+						"gpio46", "gpio47";
+				function = "qup1_se3";
+			};
+
+			config {
+				pins = "gpio44", "gpio45",
+						"gpio46", "gpio47";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+
+		qupv3_1_se3_spi_sleep: qupv3_1_se3_spi_sleep {
+			mux {
+				pins = "gpio44", "gpio45",
+						"gpio46", "gpio47";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio44", "gpio45",
+						"gpio46", "gpio47";
+				drive-strength = <6>;
+				bias-disable;
+			};
+		};
+	};
+};
+*/
+
+// spidev.ko
+/* M55 code for SR-QN6887A-01-323 by gaochao at 20230823 start */
+/*
+&qupv3_1_se3_spi {
+    status = "okay";
+    grdm-spi@0 {
+        status = "okay";
+        compatible = "sec,grdm-spi";
+        reg = <0x0>;
+        spi-max-frequency = <6500000>;
+    };
+};
+*/
+/* M55 code for SR-QN6887A-01-323 by gaochao at 20230823 end */
+
+// grdm power control
+&soc {
+    grdm-dev {
+        status = "okay";
+        compatible = "sec,guardianm";
+        // pmic ldo_vio18 power supply
+        // ldo_vio18-supply = <&mt6358_vio18_reg>;
+        // SECURITY_IC_POWER_SUPPLY_VIA_GPIO-gpio control power supply
+        sec,gpio_power = <&tlmm 55 0>;
+        // SECURITY_IC_ENABLE_SPI_VIA_SPI_CLK-SPI communicate
+        // clocks = <&infracfg_ao_clk CLK_IFRAO_SPI3>;
+        // clock-names = "grdm-clk";
+    };
+};

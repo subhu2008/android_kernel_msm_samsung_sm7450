@@ -1,0 +1,13 @@
+/* M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 start */
+&sdhc_2 {
+    cd-gpios = <&tlmm 19 GPIO_ACTIVE_HIGH>;
+};
+
+&soc {
+    sdcard-det-pin {
+        compatible = "qcom,sdcard-detect-pin";
+        qcom,sdcard-detect-pin-no = <&tlmm 19 GPIO_ACTIVE_HIGH>;
+    };
+};
+/* M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 end */
+

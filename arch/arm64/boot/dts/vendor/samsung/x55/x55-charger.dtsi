@@ -1,0 +1,82 @@
+&soc {
+    qcom,pmic_glink {
+        gxy_glink: gxy_glink {
+            compatible = "qcom,gxy_glink";
+            status = "okay";
+            /* M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 start */
+            /*config AFC */
+            pinctrl-names = "default";
+            pinctrl-0 = <&afc_switch_default &afc_data_default>;
+            afc-switch-gpio = <&pm7250b_gpios 5 GPIO_ACTIVE_LOW>;
+            afc-data-gpio = <&tlmm 18 GPIO_ACTIVE_LOW>;
+            afc_start_battery_soc = <0>;
+            afc_stop_battery_soc = <100>;
+            /* M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 end */
+        };
+    };
+
+    gxy_psy: gxy_psy {
+        compatible = "gxy,gxy_psy";
+        status = "okay";
+        /*M55 code for P240122-04615 by xiongxiaoliang at 20240123 start*/
+        gxy_battery_ttf: gxy_battery_ttf {
+            status = "okay";
+            battery,ttf_hv_disable_charge_current = <1500>;
+            battery,ttf_hv_charge_current = <2931>;
+            battery,ttf_pd25_charge_current = <4507>;
+            battery,ttf_pd45_charge_current = <5732>;
+            battery,ttf_capacity = <4855>;
+            /*fg_current soc cv_time*/
+            /*M55 code for P240131-05683 by xiongxiaoliang at 20240131 start*/
+            battery,cv_data = <
+                3893  82  1639
+                3291  85  1533
+                2811  87  1433
+                2467  89  1342
+                2268  91  1217
+                1921  93  1088
+                1621  95  949
+                1271  97  744
+                1085  98  601
+                889   99  400
+                602   100  0
+            >;
+            /*M55 code for P240131-05683 by xiongxiaoliang at 20240131 end*/
+        };
+        /*M55 code for P240122-04615 by xiongxiaoliang at 20240123 end*/
+    };
+    /*M55 code for SR-QN6887A-01-535 by xiongxiaoliang at 20231110 start*/
+    gxy_alarm: gxy_alarm {
+        compatible = "gxy, gxy_alarm";
+        status = "okay";
+    };
+    /*M55 code for SR-QN6887A-01-535 by xiongxiaoliang at 20231110 end*/
+};
+
+/* M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 start */
+&pm7250b_gpios {
+    afc_switch_gpio {
+        afc_switch_default: afc_switch_default {
+            pins = "gpio5";
+            function = "normal";
+            power-source = <1>;
+            output-low;
+            input-disable;
+            bias-disable;
+        };
+    };
+};
+
+&tlmm {
+    afc_data_gpio {
+        afc_data_default: afc_data_default {
+            pins = "gpio18";
+            function = "gpio";
+            drive-strength = <16>;
+            input-enable;
+            bias-disable;
+        };
+    };
+};
+/* M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 end */
+

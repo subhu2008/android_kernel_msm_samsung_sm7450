@@ -1,0 +1,40 @@
+/* M55 code for SR-QN6887A-01-1023 by gaochao at 20231115 start */
+&qupv3_se4_i2c {
+    /* On Low speed expansion */
+    label = "LS-QUP0_SE4";
+    /* label = "LS-QUP0_SE4"; */
+    // pinctrl-names = "default", "active";
+    // pinctrl-0 = <&i2c0_pmx_func &i2c0_cfg_func>;
+    // pinctrl-1 = <&i2c0_pmx_func &i2c0_cfg_func>;
+    status = "ok";
+    qcom,clk-freq-out = <400000>; // chipset i2c-msm-geni
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    // read-0x47, write-0x46
+    k250a@23 {
+        status = "ok";
+        compatible = "sec_k250a";
+        reg = <0x23>;
+        // 1p8_pvdd-supply = <&ldo11>;
+        reset_gpio = <&tlmm 50 0>;
+    };
+};
+/* M55 code for SR-QN6887A-01-1023 by gaochao at 20231115 end */
+
+/* M55 code for SR-QN6887A-01-318 by gaochao at 20230922 start */
+// k250a power control
+&soc {
+    k250a-dev {
+        status = "okay";
+        compatible = "sec,k250a";
+        // pmic ldo_vio18 power supply
+        // ldo_vio18-supply = <&mt6358_vio18_reg>;
+        // SECURITY_IC_POWER_SUPPLY_VIA_GPIO-gpio control power supply
+        sec,gpio_power = <&tlmm 50 0>;
+        // SECURITY_IC_ENABLE_SPI_VIA_SPI_CLK-SPI communicate
+        // clocks = <&infracfg_ao_clk CLK_IFRAO_SPI3>;
+        // clock-names = "k250a-clk";
+    };
+};
+/* M55 code for SR-QN6887A-01-318 by gaochao at 20230922 end */

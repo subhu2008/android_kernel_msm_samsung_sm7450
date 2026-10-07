@@ -1,0 +1,111 @@
+/*
+ * Copyright (C) 2020 - 2023 Semtech, Inc.
+ *
+ * $Revision: 1 $
+ * $Date: 2023-02-21 $
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ */
+
+/* M55 code for QN6887A-4859|QN6887A-5506|QN6887A-5521 by zhangziyi at 20240226 start */
+&qupv3_se3_i2c {
+    status = "ok";
+    sx937x@2c {
+        status = "okay";
+        compatible = "Semtech,SX937x";
+        reg = <0x2c>;
+        Semtech,nirq-gpio = <&tlmm 10 0>; /* IRQ */
+        Semtech,main-phases = <0x0F>;
+        Semtech,ref-phases = <0x70>;
+        /* M55 code for SR-QN6887A-01-460|SR-QN6887A-01-466 by lichang at 20230920 start */
+        /* M55 code for QN6887A-170|QN6887A-442|QN6887A-573|QN6887A-1176 by zhangziyi at 20231114 start */
+        Semtech,fw-num = <240226>;
+        /* M55 code for QN6887A-170|QN6887A-573|QN6887A-1176 by zhangziyi at 20231114 end */
+        /* M55 code for SR-QN6887A-01-460|SR-QN6887A-01-466 by lichang at 20230920 end */
+        Semtech,reg-num = <65>;
+        Semtech,reg-init = <
+            /* M55 code for QN6887A-573|QN6887A-1176 by zhangziyi at 20231114 start */
+            0x4004 0x70
+            0x4008 0x8
+            0x8020 0x32
+            0x8028 0x85E
+            0x8034 0x45E
+            0x8040 0x85E
+            0x804C 0x45E
+            0x8058 0x85E
+            0x8064 0x85E
+            0x8070 0x85E
+            0x807C 0x85E
+            0x8030 0x924925
+            0x803C 0x92C924
+            0x8048 0x964924
+            0x8054 0xB24924
+            0x8060 0x92492C
+            0x806C 0x925924
+            0x8078 0x924964
+            0x8084 0xFFFFFF
+            /* M55 code for QN6887A-170|QN6887A-3692 by zhangziyi at 20231222 start */
+            0x8098 0xAE0A
+            0x80B8 0x18
+            0x80D8 0xAE18
+            0x80F8 0x16
+            0x8118 0x00
+            0x8138 0xFF
+            0x8158 0xFF
+            0x8178 0xFF
+            0x80A0 0x202000E1
+            0x80C0 0x404000E3
+            /* M55 code for QN6887A-170 by zhangziyi at 20231013 end */
+            0x80E0 0x0
+            0x8100 0x404000E3
+            /* M55 code for QN6887A-1176 by zhangziyi at 20231114 end */
+            0x8120 0x0
+            0x8140 0x0
+            0x8160 0x0
+            0x8180 0x0
+            0x8188 0x8000014
+            0x818C 0x8000015
+            0x8190 0x8000016
+            0x8194 0x0
+            0x8090 0x54B85000
+            0x80B0 0x54B85000
+            0x80D0 0x54B85000
+            0x80F0 0x54B85000
+            0x8110 0x54AC5000
+            0x8130 0x54AC5000
+            0x8150 0x54AC5000
+            0x8170 0x54AC5000
+            /* M55 code for QN6887A-3692 by zhangziyi at 20231222 end */
+            0x8088 0x2300000
+            0x80A8 0x400000
+            0x80C8 0x400000
+            0x80E8 0x300000
+            0x8108 0x6300000
+            0x8128 0x6400000
+            0x8148 0x6300000
+            0x8168 0x6400000
+            0x808C 0x60200030
+            0x80AC 0x60200014
+            0x80CC 0x60200018
+            0x80EC 0x60200014
+            /* M55 code for QN6887A-442 by zhangziyi at 20231028 end */
+            0x810C 0x60200030
+            0x812C 0x60200030
+            0x814C 0x60200030
+            0x816C 0x60200030
+            0x8274 0x2E040000
+            0x8024 0x7f7f
+            /* M55 code for QN6887A-573 by zhangziyi at 20231102 end */
+        >;
+    };
+};
+/* M55 code for QN6887A-4859|QN6887A-5506|QN6887A-5521 by zhangziyi at 20240226 end */
