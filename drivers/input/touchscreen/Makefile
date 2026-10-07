@@ -111,4 +111,19 @@ obj-$(CONFIG_TOUCHSCREEN_COLIBRI_VF50)	+= colibri-vf50-ts.o
 obj-$(CONFIG_TOUCHSCREEN_ROHM_BU21023)	+= rohm_bu21023.o
 obj-$(CONFIG_TOUCHSCREEN_RASPBERRYPI_FW)	+= raspberrypi-ts.o
 obj-$(CONFIG_TOUCHSCREEN_IQS5XX)	+= iqs5xx.o
+obj-$(CONFIG_TOUCHSCREEN_ST)	+= st/
+obj-$(CONFIG_TOUCHSCREEN_FTS)	+= focaltech_touch/
+obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_DSX)	+= synaptics_dsx/
 obj-$(CONFIG_TOUCHSCREEN_ZINITIX)	+= zinitix.o
+obj-$(CONFIG_TOUCHSCREEN_NT36XXX_SPI)	+= nt36xxx/
+obj-$(CONFIG_TOUCHSCREEN_NT36XXX_I2C)	+= nt36xxx/
+obj-$(CONFIG_TOUCHSCREEN_GOODIX_BRL)	+= goodix_berlin_driver/
+#M55 code for SR-QN6887A-01-446 by yuli at 20230921 start
+obj-$(CONFIG_TOUCHSCREEN_FTS_I2C)	+= x55/focaltech_touch/
+#M55 code for SR-QN6887A-01-446 by yuli at 20230921 end
+# M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 start
+obj-$(CONFIG_TOUCHSCREEN_GOODIX_BRL_I2C)	+= x55/goodix/
+# M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 end
+# M55 code for SR-QN6887A-01-401 by yuli at 202300816 start
+obj-$(CONFIG_ODM_SEC_COMMON)	+= x55/touch_common/
+# M55 code for SR-QN6887A-01-401 by yuli at 202300816 end

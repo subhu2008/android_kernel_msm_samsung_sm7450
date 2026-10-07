@@ -691,6 +691,9 @@ static const struct of_device_id spidev_dt_ids[] = {
 	{ .compatible = "lwn,bk4" },
 	{ .compatible = "dh,dhcom-board" },
 	{ .compatible = "menlo,m53cpld" },
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+	{ .compatible = "sec,grdm-spi" },   // QUP1_SE3/QUPV3_1_SE3——GPIO_44, GPIO_45, GPIO_46, GPIO_47-/dev/spidev0.0
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 	{},
 };
 MODULE_DEVICE_TABLE(of, spidev_dt_ids);
@@ -749,6 +752,9 @@ static int spidev_probe(struct spi_device *spi)
 	WARN(spi->dev.of_node &&
 	     of_device_is_compatible(spi->dev.of_node, "spidev"),
 	     "%pOF: buggy DT: spidev listed directly in DT\n", spi->dev.of_node);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+        pr_err("[%s]l=%d: start\n", __FUNCTION__, __LINE__);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 
 	spidev_probe_acpi(spi);
 
@@ -793,6 +799,9 @@ static int spidev_probe(struct spi_device *spi)
 		spi_set_drvdata(spi, spidev);
 	else
 		kfree(spidev);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+        pr_err("[%s]l=%d: success\n", __FUNCTION__, __LINE__);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 
 	return status;
 }
@@ -846,16 +855,29 @@ static int __init spidev_init(void)
 	 */
 	BUILD_BUG_ON(N_SPI_MINORS > 256);
 	status = register_chrdev(SPIDEV_MAJOR, "spi", &spidev_fops);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+        pr_err("[%s]l=%d: SPIDEV_MAJOR=%d, N_SPI_MINORS=%d, status=%d\n", __FUNCTION__, __LINE__,
+            SPIDEV_MAJOR, N_SPI_MINORS, status);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 	if (status < 0)
 		return status;
 
 	spidev_class = class_create(THIS_MODULE, "spidev");
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+        if (!spidev_class) {
+            pr_err("[%s]l=%d: spidev_class is NULL\n", __FUNCTION__, __LINE__);
+        }
+        pr_err("[%s]l=%d: spidev_class success\n", __FUNCTION__, __LINE__);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 	if (IS_ERR(spidev_class)) {
 		unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);
 		return PTR_ERR(spidev_class);
 	}
 
 	status = spi_register_driver(&spidev_spi_driver);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start */
+        pr_err("[%s]l=%d: status=%d\n", __FUNCTION__, __LINE__, status);
+        /* M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end */
 	if (status < 0) {
 		class_destroy(spidev_class);
 		unregister_chrdev(SPIDEV_MAJOR, spidev_spi_driver.driver.name);

@@ -189,3 +189,7 @@ obj-$(CONFIG_GNSS)		+= gnss/
 obj-$(CONFIG_INTERCONNECT)	+= interconnect/
 obj-$(CONFIG_COUNTER)		+= counter/
 obj-$(CONFIG_MOST)		+= most/
+obj-$(CONFIG_SENSORS_FINGERPRINT)	+= fingerprint/
+# M55 code for P230918-03913 by suyurui at 20230923 start
+obj-y                   += samsung/
+# M55 code for P230918-03913 by suyurui at 20230923 end

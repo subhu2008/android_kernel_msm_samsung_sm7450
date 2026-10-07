@@ -53,6 +53,7 @@ obj-y			:= filemap.o mempool.o oom_kill.o fadvise.o \
 			   compaction.o vmacache.o \
 			   interval_tree.o list_lru.o workingset.o \
 			   debug.o gup.o $(mmu-y)
+obj-y += sec_mm/
 
 # Give 'page_alloc' its own module-parameter namespace
 page-alloc-y := page_alloc.o

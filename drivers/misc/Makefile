@@ -34,6 +34,7 @@ obj-$(CONFIG_SENSORS_TSL2550)	+= tsl2550.o
 obj-$(CONFIG_DS1682)		+= ds1682.o
 obj-$(CONFIG_C2PORT)		+= c2port/
 obj-$(CONFIG_HMC6352)		+= hmc6352.o
+obj-$(CONFIG_RTIMD_I2C)		+= rtimd-i2c/
 obj-y				+= eeprom/
 obj-y				+= cb710/
 obj-$(CONFIG_VMWARE_BALLOON)	+= vmw_balloon.o
@@ -48,9 +49,23 @@ obj-$(CONFIG_SRAM)		+= sram.o
 obj-$(CONFIG_SRAM_EXEC)		+= sram-exec.o
 obj-$(CONFIG_GENWQE)		+= genwqe/
 obj-$(CONFIG_ECHO)		+= echo/
+obj-$(CONFIG_HDCP_QSEECOM)	+= hdcp/
 obj-$(CONFIG_CXL_BASE)		+= cxl/
+# M55 code for SR-QN6887A-01-1023 by gaochao at 20231115 start
+obj-$(CONFIG_SEC_STAR)        += sec-star/
+# M55 code for SR-QN6887A-01-1023 by gaochao at 20231115 end
+# M55 code for SR-QN6887A-01-318 by gaochao at 20230922 start
+obj-$(CONFIG_I2C_KNOXVAULTDEV)        += KnoxVaultDev/
+# M55 code for SR-QN6887A-01-318 by gaochao at 20230922 end
+# M55 code for SR-QN6887A-01-321 by gaochao at 20230810 start
+obj-$(CONFIG_GRDM_POWER)        += grdm/
+# M55 code for SR-QN6887A-01-321 by gaochao at 20230810 end
+# M55 code for SR-QN6887A-01-318 by gaochao at 20230908 start
+obj-$(CONFIG_KNOXVAULT_POWER)  += KnoxVault/
+# M55 code for SR-QN6887A-01-318 by gaochao at 20230908 end
 obj-$(CONFIG_PCI_ENDPOINT_TEST)	+= pci_endpoint_test.o
 obj-$(CONFIG_OCXL)		+= ocxl/
+obj-$(CONFIG_ISL97900_LED)	+= isl97900_led/
 obj-y				+= cardreader/
 obj-$(CONFIG_PVPANIC)   	+= pvpanic.o
 obj-$(CONFIG_HABANA_AI)		+= habanalabs/
@@ -58,3 +73,17 @@ obj-$(CONFIG_UACCE)		+= uacce/
 obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
 obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
 obj-$(CONFIG_UID_SYS_STATS)	+= uid_sys_stats.o
+obj-$(CONFIG_QSEECOM)		+= qseecom-mod.o
+qseecom-mod-$(CONFIG_QSEECOM)  := qseecom.o
+qseecom-mod-$(CONFIG_COMPAT)	+= compat_qseecom.o
+obj-$(CONFIG_WIGIG_SENSING_SPI)	+= wigig_sensing.o
+obj-$(CONFIG_KINECTICS_XR_NORDIC) += kxrctrl/
+#M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 start
+obj-$(CONFIG_HQ_SIM_TRAY_CHECK) += sim_tray/
+#M55 code for SR-QN6887A-01-222 by ZhaoXiangxiang at 20230817 end
+# M55 code for SR-QN6887A-01-557|SR-QN6887A-01-558 by zhangziyi at 20230918 start
+obj-$(CONFIG_SENSOR_ADSP) += sensor/
+# M55 code for SR-QN6887A-01-557|SR-QN6887A-01-558 by zhangziyi at 20230918 end
+#M55 code for SR-QN6887A-01-342 by TangYuhang at 20231010 start
+obj-$(CONFIG_TRIGGER_CRASH_BY_KEY) += combine_key/
+#M55 code for SR-QN6887A-01-342 by TangYuhang at 20231010 end

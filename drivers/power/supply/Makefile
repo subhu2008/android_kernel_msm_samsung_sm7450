@@ -97,4 +97,21 @@ obj-$(CONFIG_CHARGER_UCS1002)	+= ucs1002_power.o
 obj-$(CONFIG_CHARGER_BD70528)	+= bd70528-charger.o
 obj-$(CONFIG_CHARGER_BD99954)	+= bd99954-charger.o
 obj-$(CONFIG_CHARGER_WILCO)	+= wilco-charger.o
+obj-$(CONFIG_QTI_BATTERY_CHARGER)	+= qti_battery_charger_main.o
+qti_battery_charger_main-y += qti_battery_charger.o qti_typec_class.o
+# M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 start
+# M55 code for SR-QN6887A-01-548 by xiongxiaoliang at 20230814 start
+obj-$(CONFIG_OEM_GLINK_CHARGER)	+= gxy_glink_main.o
+# M55 code for P240122-04615 by xiongxiaoliang at 20240123 start
+gxy_glink_main-y += gxy_glink.o gpio_afc.o gxy_battery_ttf.o
+# M55 code for P240122-04615 by xiongxiaoliang at 20240123 end
+obj-$(CONFIG_OEM_PSY_CHARGER)	+= gxy_psy_sysfs.o
+# M55 code for SR-QN6887A-01-548 by xiongxiaoliang at 20230814 end
+# M55 code for SR-QN6887A-01-596 by shixuanxuan at 20230902 end
 obj-$(CONFIG_RN5T618_POWER)	+= rn5t618_power.o
+obj-$(CONFIG_SCHGM_FLASH)       += schgm-flash.o
+obj-$(CONFIG_CHARGER_BQ256XX)	+= bq256xx_charger.o
+obj-$(CONFIG_QCOM_POWER_SUPPLY)		+= qcom/
+#M55 code for SR-QN6887A-01-535 by shixuanxuan at 20231030 start
+obj-$(CONFIG_GXY_PWRON_ALARM)	+= gxy_power_on_alarm.o
+#M55 code for SR-QN6887A-01-535 by shixuanxuan at 20231030 end

@@ -33,6 +33,7 @@
 #include <linux/hid-debug.h>
 #include <linux/hidraw.h>
 #include <linux/uhid.h>
+#include <linux/usb/composite.h>
 
 #include "hid-ids.h"
 
@@ -292,6 +293,9 @@ static int hid_add_field(struct hid_parser *parser, unsigned report_type, unsign
 
 	if (IS_ENABLED(CONFIG_UHID) && parser->device->ll_driver == &uhid_hid_driver)
 		max_buffer_size = UHID_DATA_MAX;
+
+	if (parser->device->ll_driver == &acc_hid_ll_driver)
+		max_buffer_size = USB_COMP_EP0_BUFSIZ;
 
 	/* Total size check: Allow for possible report index byte */
 	if (report->size > (max_buffer_size - 1) << 3) {
@@ -1659,7 +1663,7 @@ u8 *hid_alloc_report_buf(struct hid_report *report, gfp_t flags)
 
 	u32 len = hid_report_len(report) + 7;
 
-	return kmalloc(len, flags);
+	return kzalloc(len, flags);
 }
 EXPORT_SYMBOL_GPL(hid_alloc_report_buf);
 
@@ -1776,6 +1780,9 @@ int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, u32 size,
 
 	if (IS_ENABLED(CONFIG_UHID) && hid->ll_driver == &uhid_hid_driver)
 		max_buffer_size = UHID_DATA_MAX;
+
+	if (hid->ll_driver == &acc_hid_ll_driver)
+		max_buffer_size = USB_COMP_EP0_BUFSIZ;
 
 	if (report_enum->numbered && rsize >= max_buffer_size)
 		rsize = max_buffer_size - 1;

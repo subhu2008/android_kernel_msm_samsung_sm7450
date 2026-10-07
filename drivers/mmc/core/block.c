@@ -2944,6 +2944,10 @@ static int mmc_blk_probe(struct mmc_card *card)
 		md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
 		cap_str, md->read_only ? "(ro)" : "");
 
+	ST_LOG("%s: %s %s %s %s\n",
+		md->disk->disk_name, mmc_card_id(card), mmc_card_name(card),
+		cap_str, md->read_only ? "(ro)" : "");
+
 	if (mmc_blk_alloc_parts(card, md))
 		goto out;
 

@@ -1335,4 +1335,22 @@ config TOUCHSCREEN_ZINITIX
 	  To compile this driver as a module, choose M here: the
 	  module will be called zinitix.
 
+source "drivers/input/touchscreen/st/Kconfig"
+
+source "drivers/input/touchscreen/focaltech_touch/Kconfig"
+
+source "drivers/input/touchscreen/synaptics_dsx/Kconfig"
+
+source "drivers/input/touchscreen/nt36xxx/Kconfig"
+
+source "drivers/input/touchscreen/goodix_berlin_driver/Kconfig"
+#M55 code for SR-QN6887A-01-446 by yuli at 20230921 start
+source "drivers/input/touchscreen/x55/focaltech_touch/Kconfig"
+#M55 code for SR-QN6887A-01-446 by yuli at 20230921 end
+# M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 start
+source "drivers/input/touchscreen/x55/goodix/Kconfig"
+# M55 code for SR-QN6887A-01-401 by hehaoran at 20230809 end
+# M55 code for SR-QN6887A-01-401 by yuli at 202300816 start
+source "drivers/input/touchscreen/x55/touch_common/Kconfig"
+# M55 code for SR-QN6887A-01-401 by yuli at 202300816 end
 endif

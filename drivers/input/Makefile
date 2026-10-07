@@ -29,3 +29,6 @@ obj-$(CONFIG_INPUT_MISC)	+= misc/
 obj-$(CONFIG_INPUT_APMPOWER)	+= apm-power.o
 
 obj-$(CONFIG_RMI4_CORE)		+= rmi4/
+# M55 code for SR-QN6887A-01-457 by lichang at 20230907 start
+obj-$(CONFIG_SAR_SENSOR)		+= sar/
+# M55 code for SR-QN6887A-01-457 by lichang at 20230907 end

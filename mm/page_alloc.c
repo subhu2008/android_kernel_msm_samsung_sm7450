@@ -71,6 +71,7 @@
 #include <linux/psi.h>
 #include <linux/padata.h>
 #include <linux/khugepaged.h>
+#include <linux/sched/cputime.h>
 #include <trace/hooks/mm.h>
 #include <trace/hooks/vmscan.h>
 
@@ -4582,7 +4583,7 @@ retry:
 		unreserve_highatomic_pageblock(ac, false);
 		trace_android_vh_drain_all_pages_bypass(gfp_mask, order,
 			alloc_flags, ac->migratetype, *did_some_progress, &skip_pcp_drain);
-		if (!skip_pcp_drain)
+		if (!skip_pcp_drain && !need_memory_boosting())
 			drain_all_pages(NULL);
 		drained = true;
 		goto retry;
@@ -4835,7 +4836,7 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	const bool costly_order = order > PAGE_ALLOC_COSTLY_ORDER;
 	struct page *page = NULL;
 	unsigned int alloc_flags;
-	unsigned long did_some_progress;
+	unsigned long did_some_progress = 0;
 	enum compact_priority compact_priority;
 	enum compact_result compact_result;
 	int compaction_retries;
@@ -4845,6 +4846,12 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	int reserve_flags;
 	unsigned long vh_record;
 	bool should_alloc_retry = false;
+	unsigned long pages_reclaimed = 0;
+	int retry_loop_count = 0;
+	unsigned long jiffies_s = jiffies;
+	u64 utime, stime_s, stime_e, stime_d;
+
+	task_cputime(current, &utime, &stime_s);
 
 	trace_android_vh_alloc_pages_slowpath_begin(gfp_mask, order, &vh_record);
 	/*
@@ -4947,6 +4954,7 @@ restart:
 	}
 
 retry:
+	retry_loop_count++;
 	/* Ensure kswapd doesn't accidentally go to sleep as long as we loop */
 	if (alloc_flags & ALLOC_KSWAPD)
 		wake_all_kswapds(order, gfp_mask, ac);
@@ -4994,6 +5002,7 @@ retry:
 	/* Try direct reclaim and then allocating */
 	page = __alloc_pages_direct_reclaim(gfp_mask, order, alloc_flags, ac,
 							&did_some_progress);
+	pages_reclaimed += did_some_progress;
 	if (page)
 		goto got_pg;
 
@@ -5115,6 +5124,32 @@ fail:
 			"page allocation failure: order:%u", order);
 got_pg:
 	trace_android_vh_alloc_pages_slowpath_end(gfp_mask, order, vh_record);
+
+	task_cputime(current, &utime, &stime_e);
+	stime_d = stime_e - stime_s;
+	if (stime_d / NSEC_PER_MSEC > 256) {
+		pg_data_t *pgdat;
+
+		unsigned long a_anon = 0;
+		unsigned long in_anon = 0;
+		unsigned long a_file = 0;
+		unsigned long in_file = 0;
+
+		for_each_online_pgdat(pgdat) {
+			a_anon += node_page_state(pgdat, NR_ACTIVE_ANON);
+			in_anon += node_page_state(pgdat, NR_INACTIVE_ANON);
+			a_file += node_page_state(pgdat, NR_ACTIVE_FILE);
+			in_file += node_page_state(pgdat, NR_INACTIVE_FILE);
+		}
+		pr_info("alloc stall: timeJS(ms):%u|%u rec:%lu|%lu ret:%d o:%d gfp:%#x(%pGg) AaiFai:%lukB|%lukB|%lukB|%lukB\n",
+			jiffies_to_msecs(jiffies - jiffies_s),
+			stime_d / NSEC_PER_MSEC,
+			did_some_progress, pages_reclaimed, retry_loop_count,
+			order, gfp_mask, &gfp_mask,
+			a_anon << (PAGE_SHIFT-10), in_anon << (PAGE_SHIFT-10),
+			a_file << (PAGE_SHIFT-10), in_file << (PAGE_SHIFT-10));
+	}
+
 	return page;
 }
 
@@ -7915,9 +7950,15 @@ unsigned long free_reserved_area(void *start, void *end, int poison, const char 
 		free_reserved_page(page);
 	}
 
-	if (pages && s)
-		pr_info("Freeing %s memory: %ldK\n",
-			s, pages << (PAGE_SHIFT - 10));
+	if (pages && s) {
+		pr_info("Freeing %s memory: %ldK\n", s, pages << (PAGE_SHIFT - 10));
+		if (!strcmp(s, "initrd") || !strcmp(s, "unused kernel")) {
+			long size;
+
+			size = -1 * (long)(pages << PAGE_SHIFT);
+			memblock_memsize_mod_kernel_size(size);
+		}
+	}
 
 	return pages;
 }

@@ -122,6 +122,10 @@ config SPARSEMEM_VMEMMAP
 	  pfn_to_page and page_to_pfn operations.  This is the most
 	  efficient option when sufficient kernel resources are available.
 
+config MEMBLOCK_MEMSIZE
+	bool "memblock based reserved memory profiling"
+	default y
+
 config HAVE_MEMBLOCK_PHYS_MAP
 	bool
 
@@ -896,6 +900,39 @@ config ARCH_HAS_HUGEPD
 config MAPPING_DIRTY_HELPERS
         bool
 
+config MMAP_READAROUND_LIMIT
+	int "Limit mmap readaround upperbound"
+	default 16
+	help
+	  Inappropriate mmap readaround size can hurt device performance
+	  during the sluggish situation. Add the hard upper-limit for
+	  mmap readaround.
+
+config FAULT_AROUND_BYTES
+	int "Fault around bytes"
+	default 32768
+	range 4096 65536
+	help
+	  The number of bytes to be mapped around the fault.
+
+config DIRECT_RECLAIM_FILE_PAGES_ONLY
+	bool "Reclaim file pages only on direct reclaim path"
+	depends on SWAP
+	default y
+
+config BALANCE_ANON_FILE_RECLAIM
+	bool "During reclaim treat anon and file backed pages equally"
+	depends on SWAP
+	default y
+	help
+	  When performing memory reclaim treat anonymous and file backed pages
+	  equally.
+	  Swapping anonymous pages out to memory can be efficient enough to justify
+	  treating anonymous and file backed pages equally.
+
 source "mm/damon/Kconfig"
 
 endmenu
+
+source "mm/sec_mm/Kconfig"
+

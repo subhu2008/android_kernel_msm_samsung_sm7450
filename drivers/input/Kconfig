@@ -185,6 +185,11 @@ config INPUT_APMPOWER
 	  To compile this driver as a module, choose M here: the
 	  module will be called apm-power.
 
+# M55 code for SR-QN6887A-01-499 by duxinqi at 20230830 start
+config INPUT_FP
+	tristate "input fp"
+# M55 code for SR-QN6887A-01-499 by duxinqi at 20230830 end
+
 comment "Input Device Drivers"
 
 source "drivers/input/keyboard/Kconfig"
@@ -208,6 +213,10 @@ menu "Hardware I/O ports"
 source "drivers/input/serio/Kconfig"
 
 source "drivers/input/gameport/Kconfig"
+
+# M55 code for SR-QN6887A-01-457 by lichang at 20230907 start
+source "drivers/input/sar/Kconfig"
+# M55 code for SR-QN6887A-01-457 by lichang at 20230907 end
 
 endmenu
 

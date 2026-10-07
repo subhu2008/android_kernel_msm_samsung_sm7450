@@ -568,7 +568,11 @@ static int gs_start_io(struct gs_port *port)
 		gs_start_tx(port);
 		/* Unblock any pending writes into our circular buffer, in case
 		 * we didn't in gs_start_tx() */
-		tty_wakeup(port->port.tty);
+		/* M55 code for QN6887A-854 by liufurong at 20231113 start */
+		if (port->port.tty) {
+			tty_wakeup(port->port.tty);
+		}
+		/* M55 code for QN6887A-854 by liufurong at 20231113 end */
 	} else {
 		gs_free_requests(ep, head, &port->read_allocated);
 		gs_free_requests(port->port_usb->in, &port->write_pool,

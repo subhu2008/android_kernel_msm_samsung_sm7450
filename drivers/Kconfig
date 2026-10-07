@@ -235,4 +235,10 @@ source "drivers/interconnect/Kconfig"
 source "drivers/counter/Kconfig"
 
 source "drivers/most/Kconfig"
+
+source "drivers/fingerprint/Kconfig"
+
+# M55 code for P230918-03913 by suyurui at 20230923 start
+source "drivers/samsung/Kconfig"
+# M55 code for P230918-03913 by suyurui at 20230923 end
 endmenu
