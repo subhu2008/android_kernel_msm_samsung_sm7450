@@ -36,4 +36,4 @@ dtstree	:= $(srctree)/$(src)
 vendor  := $(dtstree)/vendor
 ifneq "$(wildcard $(vendor)/Makefile)" ""
     subdir-y += vendor
-#endif
+endif
