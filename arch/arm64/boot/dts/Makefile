@@ -32,8 +32,8 @@ subdir-y += xilinx
 subdir-y += zte
 subdir-y += samsung
 
-#dtstree	:= $(srctree)/$(src)
-#vendor  := $(dtstree)/vendor
-#ifneq "$(wildcard $(vendor)/Makefile)" ""
-#    subdir-y += vendor
+dtstree	:= $(srctree)/$(src)
+vendor  := $(dtstree)/vendor
+ifneq "$(wildcard $(vendor)/Makefile)" ""
+    subdir-y += vendor
 #endif
