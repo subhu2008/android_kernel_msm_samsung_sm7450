@@ -5,7 +5,7 @@
 
 define __sec_dtbo_build
 dtbo-$(2) += $(1)
-$(1)-base := $(3)
+# $(1)-base := $(3)
 endef
 
 define sec_dtbo_build
