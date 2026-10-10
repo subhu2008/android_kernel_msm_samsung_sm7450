@@ -26,7 +26,7 @@ SEC_M55XQ_BOARDS        := \
         diwali-sec.m55xq.overlay.06.dtbo \
         diwali-sec.m55xq.overlay.07.dtbo
 
-# SEC_DIWALI_BASE_DTB := $(QCOM_DTB)/diwali.dtb $(QCOM_DTB)/diwalip.dtb $(QCOM_DTB)/diwali-lte.dtb
+SEC_DIWALI_BASE_DTB := $(QCOM_DTB)/diwali.dtb $(QCOM_DTB)/diwalip.dtb $(QCOM_DTB)/diwali-lte.dtb
 
 $(eval $(call sec_dtbo_build, \
 		$(SEC_M55XQ_BOARDS),$(CONFIG_ARCH_X55),$(SEC_DIWALI_BASE_DTB)))
