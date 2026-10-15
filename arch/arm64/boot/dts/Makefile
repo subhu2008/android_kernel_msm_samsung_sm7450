@@ -31,15 +31,3 @@ subdir-y += toshiba
 subdir-y += xilinx
 subdir-y += zte
 subdir-y += samsung
-
-# samsung/m55xq builds the diwali base dtbs via ../../vendor/samsung, the same
-# files vendor/samsung builds. They are separate sub-makes, so order the
-# directories: finish all of vendor/ before descending into samsung/.
-
-$(obj)/samsung: | $(obj)/vendor
-
-dtstree	:= $(srctree)/$(src)
-vendor  := $(dtstree)/vendor
-ifneq "$(wildcard $(vendor)/Makefile)" ""
-    subdir-y += vendor
-endif
