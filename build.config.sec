@@ -6,3 +6,8 @@ if [[ "${TARGET_BUILD_VARIANT}" != "user" ]]; then
 	apply_defconfig_fragment ${KERNEL_DIR}/arch/${ARCH}/configs/vendor/${MSM_ARCH}_sec_${TARGET_BUILD_VARIANT}_defconfig vendor/${MSM_ARCH}-debug_defconfig
 fi
 
+# Base DTBs built from this kernel tree
+FILES+="
+arch/${ARCH}/boot/dts/samsung/m55xq/diwali-base/*.dtb*
+"
+
