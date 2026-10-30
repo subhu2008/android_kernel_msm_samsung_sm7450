@@ -47,11 +47,9 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len);
 
 int qrtr_peek_pkt_size(const void *data);
 
-void qrtr_ns_init(void);
+int qrtr_ns_init(void);
 
 void qrtr_ns_remove(void);
-
-int qrtr_peek_pkt_size(const void *data);
 
 int qrtr_get_service_id(unsigned int node_id, unsigned int port_id);
 

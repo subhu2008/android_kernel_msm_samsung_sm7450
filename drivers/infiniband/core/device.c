@@ -58,6 +58,7 @@ struct workqueue_struct *ib_comp_wq;
 struct workqueue_struct *ib_comp_unbound_wq;
 struct workqueue_struct *ib_wq;
 EXPORT_SYMBOL_GPL(ib_wq);
+static struct workqueue_struct *ib_unreg_wq;
 
 /*
  * Each of the three rwsem locks (devices, clients, client_data) protects the
@@ -92,6 +93,7 @@ EXPORT_SYMBOL_GPL(ib_wq);
 static DEFINE_XARRAY_FLAGS(devices, XA_FLAGS_ALLOC);
 static DECLARE_RWSEM(devices_rwsem);
 #define DEVICE_REGISTERED XA_MARK_1
+#define DEVICE_GID_UPDATES XA_MARK_2
 
 static u32 highest_client_id;
 #define CLIENT_REGISTERED XA_MARK_1
@@ -1396,8 +1398,13 @@ int ib_register_device(struct ib_device *device, const char *name,
 		return ret;
 	}
 	dev_set_uevent_suppress(&device->dev, false);
+
+	down_read(&devices_rwsem);
+
 	/* Mark for userspace that device is ready */
 	kobject_uevent(&device->dev.kobj, KOBJ_ADD);
+
+	up_read(&devices_rwsem);
 	ib_device_put(device);
 
 	return 0;
@@ -1557,7 +1564,7 @@ void ib_unregister_device_queued(struct ib_device *ib_dev)
 	WARN_ON(!refcount_read(&ib_dev->refcount));
 	WARN_ON(!ib_dev->ops.dealloc_driver);
 	get_device(&ib_dev->dev);
-	if (!queue_work(system_unbound_wq, &ib_dev->unregistration_work))
+	if (!queue_work(ib_unreg_wq, &ib_dev->unregistration_work))
 		put_device(&ib_dev->dev);
 }
 EXPORT_SYMBOL(ib_unregister_device_queued);
@@ -1686,7 +1693,7 @@ static int assign_client_id(struct ib_client *client)
 {
 	int ret;
 
-	down_write(&clients_rwsem);
+	lockdep_assert_held(&clients_rwsem);
 	/*
 	 * The add/remove callbacks must be called in FIFO/LIFO order. To
 	 * achieve this we assign client_ids so they are sorted in
@@ -1695,14 +1702,11 @@ static int assign_client_id(struct ib_client *client)
 	client->client_id = highest_client_id;
 	ret = xa_insert(&clients, client->client_id, client, GFP_KERNEL);
 	if (ret)
-		goto out;
+		return ret;
 
 	highest_client_id++;
 	xa_set_mark(&clients, client->client_id, CLIENT_REGISTERED);
-
-out:
-	up_write(&clients_rwsem);
-	return ret;
+	return 0;
 }
 
 static void remove_client_id(struct ib_client *client)
@@ -1732,25 +1736,35 @@ int ib_register_client(struct ib_client *client)
 {
 	struct ib_device *device;
 	unsigned long index;
+	bool need_unreg = false;
 	int ret;
 
 	refcount_set(&client->uses, 1);
 	init_completion(&client->uses_zero);
+
+	/*
+	 * The devices_rwsem is held in write mode to ensure that a racing
+	 * ib_register_device() sees a consisent view of clients and devices.
+	 */
+	down_write(&devices_rwsem);
+	down_write(&clients_rwsem);
 	ret = assign_client_id(client);
 	if (ret)
-		return ret;
+		goto out;
 
-	down_read(&devices_rwsem);
+	need_unreg = true;
 	xa_for_each_marked (&devices, index, device, DEVICE_REGISTERED) {
 		ret = add_client_context(device, client);
-		if (ret) {
-			up_read(&devices_rwsem);
-			ib_unregister_client(client);
-			return ret;
-		}
+		if (ret)
+			goto out;
 	}
-	up_read(&devices_rwsem);
-	return 0;
+	ret = 0;
+out:
+	up_write(&clients_rwsem);
+	up_write(&devices_rwsem);
+	if (need_unreg && ret)
+		ib_unregister_client(client);
+	return ret;
 }
 EXPORT_SYMBOL(ib_register_client);
 
@@ -1863,9 +1877,9 @@ static int __ib_get_client_nl_info(struct ib_device *ibdev,
 
 /**
  * ib_get_client_nl_info - Fetch the nl_info from a client
- * @device - IB device
- * @client_name - Name of the client
- * @res - Result of the query
+ * @ibdev: IB device
+ * @client_name: Name of the client
+ * @res: Result of the query
  */
 int ib_get_client_nl_info(struct ib_device *ibdev, const char *client_name,
 			  struct ib_client_nl_info *res)
@@ -2099,6 +2113,9 @@ int ib_device_set_netdev(struct ib_device *ib_dev, struct net_device *ndev,
 	unsigned long flags;
 	int ret;
 
+	if (!rdma_is_port_valid(ib_dev, port))
+		return -EINVAL;
+
 	/*
 	 * Drivers wish to call this before ib_register_driver, so we have to
 	 * setup the port data early.
@@ -2106,9 +2123,6 @@ int ib_device_set_netdev(struct ib_device *ib_dev, struct net_device *ndev,
 	ret = alloc_port_data(ib_dev);
 	if (ret)
 		return ret;
-
-	if (!rdma_is_port_valid(ib_dev, port))
-		return -EINVAL;
 
 	pdata = &ib_dev->port_data[port];
 	spin_lock_irqsave(&pdata->netdev_lock, flags);
@@ -2288,12 +2302,43 @@ void ib_enum_all_roce_netdevs(roce_netdev_filter filter,
 	unsigned long index;
 
 	down_read(&devices_rwsem);
-	xa_for_each_marked (&devices, index, dev, DEVICE_REGISTERED)
+	xa_for_each_marked(&devices, index, dev, DEVICE_GID_UPDATES)
 		ib_enum_roce_netdev(dev, filter, filter_cookie, cb, cookie);
 	up_read(&devices_rwsem);
 }
 
 /**
+ * ib_device_enable_gid_updates - Mark device as ready for GID cache updates
+ * @device: Device to mark
+ *
+ * Called after GID table is allocated and initialized. After this mark is set,
+ * netdevice event handlers can update the device's GID cache. This allows
+ * events that arrive during device registration to be processed, avoiding
+ * stale GID entries when netdev properties change during the device
+ * registration process.
+ */
+void ib_device_enable_gid_updates(struct ib_device *device)
+{
+	down_write(&devices_rwsem);
+	xa_set_mark(&devices, device->index, DEVICE_GID_UPDATES);
+	up_write(&devices_rwsem);
+}
+
+/**
+ * ib_device_disable_gid_updates - Clear the GID updates mark
+ * @device: Device to unmark
+ *
+ * Called before GID table cleanup to prevent event handlers from accessing
+ * the device while it's being torn down.
+ */
+void ib_device_disable_gid_updates(struct ib_device *device)
+{
+	down_write(&devices_rwsem);
+	xa_clear_mark(&devices, device->index, DEVICE_GID_UPDATES);
+	up_write(&devices_rwsem);
+}
+
+/*
  * ib_enum_all_devs - enumerate all ib_devices
  * @cb: Callback to call for each found ib_device
  *
@@ -2708,27 +2753,28 @@ static const struct rdma_nl_cbs ibnl_ls_cb_table[RDMA_NL_LS_NUM_OPS] = {
 
 static int __init ib_core_init(void)
 {
-	int ret;
+	int ret = -ENOMEM;
 
 	ib_wq = alloc_workqueue("infiniband", 0, 0);
 	if (!ib_wq)
 		return -ENOMEM;
 
+	ib_unreg_wq = alloc_workqueue("ib-unreg-wq", WQ_UNBOUND,
+				      WQ_UNBOUND_MAX_ACTIVE);
+	if (!ib_unreg_wq)
+		goto err;
+
 	ib_comp_wq = alloc_workqueue("ib-comp-wq",
 			WQ_HIGHPRI | WQ_MEM_RECLAIM | WQ_SYSFS, 0);
-	if (!ib_comp_wq) {
-		ret = -ENOMEM;
-		goto err;
-	}
+	if (!ib_comp_wq)
+		goto err_unbound;
 
 	ib_comp_unbound_wq =
 		alloc_workqueue("ib-comp-unb-wq",
 				WQ_UNBOUND | WQ_HIGHPRI | WQ_MEM_RECLAIM |
 				WQ_SYSFS, WQ_UNBOUND_MAX_ACTIVE);
-	if (!ib_comp_unbound_wq) {
-		ret = -ENOMEM;
+	if (!ib_comp_unbound_wq)
 		goto err_comp;
-	}
 
 	ret = class_register(&ib_class);
 	if (ret) {
@@ -2796,6 +2842,8 @@ err_comp_unbound:
 	destroy_workqueue(ib_comp_unbound_wq);
 err_comp:
 	destroy_workqueue(ib_comp_wq);
+err_unbound:
+	destroy_workqueue(ib_unreg_wq);
 err:
 	destroy_workqueue(ib_wq);
 	return ret;
@@ -2817,7 +2865,8 @@ static void __exit ib_core_cleanup(void)
 	destroy_workqueue(ib_comp_wq);
 	/* Make sure that any pending umem accounting work is done. */
 	destroy_workqueue(ib_wq);
-	flush_workqueue(system_unbound_wq);
+	destroy_workqueue(ib_unreg_wq);
+	rcu_barrier();
 	WARN_ON(!xa_empty(&clients));
 	WARN_ON(!xa_empty(&devices));
 }

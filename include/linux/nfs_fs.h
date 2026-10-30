@@ -383,6 +383,7 @@ extern int nfs_open(struct inode *, struct file *);
 extern int nfs_attribute_cache_expired(struct inode *inode);
 extern int nfs_revalidate_inode(struct nfs_server *server, struct inode *inode);
 extern int __nfs_revalidate_inode(struct nfs_server *, struct inode *);
+extern int nfs_clear_invalid_mapping(struct address_space *mapping);
 extern bool nfs_mapping_need_revalidate_inode(struct inode *inode);
 extern int nfs_revalidate_mapping(struct inode *inode, struct address_space *mapping);
 extern int nfs_revalidate_mapping_rcu(struct inode *inode);
@@ -553,6 +554,7 @@ extern int nfs_wb_page_cancel(struct inode *inode, struct page* page);
 extern int  nfs_commit_inode(struct inode *, int);
 extern struct nfs_commit_data *nfs_commitdata_alloc(void);
 extern void nfs_commit_free(struct nfs_commit_data *data);
+void nfs_commit_begin(struct nfs_mds_commit_info *cinfo);
 bool nfs_commit_end(struct nfs_mds_commit_info *cinfo);
 
 static inline int
@@ -590,6 +592,15 @@ nfs_fileid_to_ino_t(u64 fileid)
 
 #define NFS_JUKEBOX_RETRY_TIME (5 * HZ)
 
+/* We need to block new opens while a file is being unlinked.
+ * If it is opened *before* we decide to unlink, we will silly-rename
+ * instead. If it is opened *after*, then we need to create or will fail.
+ * If we allow the two to race, we could end up with a file that is open
+ * but deleted on the server resulting in ESTALE.
+ * So use ->d_fsdata to record when the unlink is happening
+ * and block dentry revalidation while it is set.
+ */
+#define NFS_FSDATA_BLOCKED ((void*)1)
 
 # undef ifdebug
 # ifdef NFS_DEBUG

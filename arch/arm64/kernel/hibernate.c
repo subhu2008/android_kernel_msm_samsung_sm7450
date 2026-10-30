@@ -39,6 +39,7 @@
 #include <asm/suspend.h>
 #include <asm/sysreg.h>
 #include <asm/virt.h>
+#include <linux/kfence.h>
 
 /*
  * Hibernate core relies on this value being 0 on resume, and marks it
@@ -419,8 +420,10 @@ int swsusp_arch_suspend(void)
 		crash_prepare_suspend();
 
 		ret = swsusp_mte_save_tags();
-		if (ret)
+		if (ret) {
+			local_daif_restore(flags);
 			return ret;
+		}
 
 		sleep_cpu = smp_processor_id();
 		ret = swsusp_save();
@@ -473,7 +476,8 @@ static void _copy_pte(pte_t *dst_ptep, pte_t *src_ptep, unsigned long addr)
 		 * the temporary mappings we use during restore.
 		 */
 		set_pte(dst_ptep, pte_mkwrite(pte));
-	} else if (debug_pagealloc_enabled() && !pte_none(pte)) {
+	} else if ((debug_pagealloc_enabled() ||
+                    is_kfence_address((void *)addr)) && !pte_none(pte)) {
 		/*
 		 * debug_pagealloc will removed the PTE_VALID bit if
 		 * the page isn't in use by the resume kernel. It may have
@@ -644,7 +648,7 @@ static int trans_pgd_create_copy(pgd_t **dst_pgdp, unsigned long start,
  * Memory allocated by get_safe_page() will be dealt with by the hibernate code,
  * we don't need to free it here.
  */
-int swsusp_arch_resume(void)
+int __nocfi swsusp_arch_resume(void)
 {
 	int rc;
 	void *zero_page;
@@ -711,9 +715,21 @@ int swsusp_arch_resume(void)
 		__hyp_set_vectors(el2_vectors);
 	}
 
+	/*
+	 * It is necessary to mask all DAIF exceptions here as:
+	 *
+	 * - The copy of swsusp_arch_suspend_exit() in the hibernation
+	 *   text cannot handle taking any exceptions.
+	 *
+	 * - The suspended kernel masked all DAIF exceptions in
+	 *   swsusp_arch_resume(), and expects to be re-entered in the
+	 *   same state : with all DAIF exceptions masked.
+	 */
+	local_daif_save();
 	hibernate_exit(virt_to_phys(tmp_pg_dir), resume_hdr.ttbr1_el1,
 		       resume_hdr.reenter_kernel, restore_pblist,
 		       resume_hdr.__hyp_stub_vectors, virt_to_phys(zero_page));
+	unreachable();
 
 	return 0;
 }

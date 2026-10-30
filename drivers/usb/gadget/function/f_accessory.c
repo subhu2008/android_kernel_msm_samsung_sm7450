@@ -173,7 +173,7 @@ static struct usb_ss_ep_comp_descriptor acc_superspeedplus_comp_desc = {
 	.bDescriptorType        = USB_DT_SS_ENDPOINT_COMP,
 
 	/* the following 2 values can be tweaked if necessary */
-	/* .bMaxBurst =         0, */
+	.bMaxBurst              = 6,
 	/* .bmAttributes =      0, */
 };
 
@@ -198,7 +198,7 @@ static struct usb_ss_ep_comp_descriptor acc_superspeed_comp_desc = {
 	.bDescriptorType        = USB_DT_SS_ENDPOINT_COMP,
 
 	/* the following 2 values can be tweaked if necessary */
-	/* .bMaxBurst =         0, */
+	.bMaxBurst              = 6,
 	/* .bmAttributes =      0, */
 };
 
@@ -503,7 +503,7 @@ static void acc_complete_send_hid_event(struct usb_ep *ep,
 		return;
 	}
 
-	hid_report_raw_event(hid->hid, HID_INPUT_REPORT, req->buf, length, 1);
+	__hid_report_raw_event(hid->hid, HID_INPUT_REPORT, req->buf, length, length, 1);
 }
 
 static int acc_hid_parse(struct hid_device *hid)
