@@ -895,15 +895,6 @@ static struct smcinvoke_cb_txn *find_cbtxn_locked(
 }
 
 /*
- * size_add saturates at SIZE_MAX. If integer overflow is detected,
- * this function would return SIZE_MAX otherwise normal a+b is returned.
- */
-static inline size_t size_add(size_t a, size_t b)
-{
-	return (b > (SIZE_MAX - a)) ? SIZE_MAX : a + b;
-}
-
-/*
  * pad_size is used along with size_align to define a buffer overflow
  * protected version of ALIGN
  */
@@ -2827,7 +2818,7 @@ static int smcinvoke_probe(struct platform_device *pdev)
 	unsigned int count = 1;
 	int rc = 0;
 
-	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+	rc = dma_set_mask_and_coherent(&pdev->dev, ~0ULL);
 	if (rc) {
 		pr_err("dma_set_mask_and_coherent failed %d\n", rc);
 		return rc;
