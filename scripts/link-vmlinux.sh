@@ -272,12 +272,7 @@ kallsyms()
 
 	info KSYMS ${2}
 
-	if [ -n "${CONFIG_CFI_CLANG}" ]; then
-		${PERL} ${srctree}/scripts/generate_cfi_kallsyms.pl ${1} | \
-			sort -n > .tmp_kallsyms
-	else
-		${NM} -n ${1} > .tmp_kallsyms
-	fi
+	${NM} -n ${1} > .tmp_kallsyms
 
 	scripts/kallsyms ${kallsymopt} < .tmp_kallsyms > ${2}
 }

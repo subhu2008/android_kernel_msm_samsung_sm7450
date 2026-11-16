@@ -554,8 +554,3 @@ INIT_PER_CPU(irq_stack_backing_store);
 . = ASSERT(kexec_control_code_size <= KEXEC_CONTROL_CODE_MAX_SIZE,
            "kexec control code size is too big");
 #endif
-
-#ifdef CONFIG_CFI_CLANG
-. = ASSERT((__cfi_jt_end - __cfi_jt_start > 0),
-	   "CFI jump table is empty");
-#endif
