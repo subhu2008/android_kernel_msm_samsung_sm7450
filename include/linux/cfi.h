@@ -15,6 +15,15 @@ struct module;
 struct pt_regs;
 
 /*
+ * asm/module.h provides the native Elf_Ehdr/Elf_Shdr aliases used by
+ * module_cfi_finalize(). It normally comes in through linux/module.h, but
+ * this header is included by linux/module.h before that point, so pull it
+ * in explicitly. The forward declarations above keep its function
+ * prototypes valid.
+ */
+#include <asm/module.h>
+
+/*
  * Type of the legacy LLVM CFI check function. The 6.x kCFI scheme does not
  * use it anymore, but struct module keeps the field to preserve the GKI
  * structure layout, so the type must be available even when CFI is disabled
